@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include "stl_reader.h"
+#include "./stl_reader/stl_reader.h"
 #include "KDTree.h"
 
 namespace STLNonManifold {
