@@ -147,6 +147,7 @@ namespace STLNonManifold {
 
 				}
 
+				// [debug]
 				//std::cout << i << ": ";
 				//for (auto&& coord : same_coords) {
 				//	std::cout << coord.GetId() <<" ";
@@ -241,12 +242,15 @@ namespace STLNonManifold {
 		}
 
 		void CheckNonManifold() {
+
+			int non_manifold_count = 0;
+
 			for (auto&& triangle_ptr : triangles) {
 				//std::cout << "Triangle: " << triangle_ptr->id << std::endl;
 
 				for (auto&& edge_ptr : triangle_ptr->edges) {
 					//std::cout << "Edge: " << edge_ptr->id << std::endl;
-
+					non_manifold_count++;
 
 					if (edge_ptr->incident_triangles.size() != 2) {
 						std::cout << "======" << std::endl;
@@ -262,7 +266,8 @@ namespace STLNonManifold {
 				}
 			}
 
-			std::cout << "Check end." << std::endl;
+			std::cout << "Total NonManifold Count: " << non_manifold_count << std::endl;
+			std::cout << "CheckNonManifold end." << std::endl;
 		}
 		
 		stl_reader::StlMesh <STLNonManifold::Geometry::T_NUM, unsigned int> mesh;
