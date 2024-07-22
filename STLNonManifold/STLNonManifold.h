@@ -156,7 +156,7 @@ namespace STLNonManifold {
 				//std::cout << std::endl;
 			}
 
-			// [debug]
+			 //[debug]
 			//for (auto&& id : coordinates_indices) {
 			//	std::cout << id << ", ";
 			//}
@@ -250,9 +250,9 @@ namespace STLNonManifold {
 
 				for (auto&& edge_ptr : triangle_ptr->edges) {
 					//std::cout << "Edge: " << edge_ptr->id << std::endl;
-					non_manifold_count++;
 
 					if (edge_ptr->incident_triangles.size() != 2) {
+						non_manifold_count++;
 						std::cout << "======" << std::endl;
 						std::cout << "NonManifold: " << edge_ptr->incident_triangles.size() << std::endl;
 						std::cout << "Triangle: " << triangle_ptr->id << std::endl;
