@@ -14,6 +14,7 @@
 
 #include "./stl_reader/stl_reader.h"
 #include "KDTree.h"
+#include "CoreOld.h"
 
 namespace STLNonManifold {
 
@@ -236,9 +237,13 @@ namespace STLNonManifold {
 			edgesCount = edges_count;
 			trianglesCount = triangles_count;
 
-			std::cout << "verticesCount: " << verticesCount << std::endl;
-			std::cout << "edgesCount: " << edgesCount << std::endl;
-			std::cout << "trianglesCount: " << trianglesCount << std::endl;
+			//std::cout << "verticesCount: " << verticesCount << std::endl;
+			//std::cout << "edgesCount: " << edgesCount << std::endl;
+			//std::cout << "trianglesCount: " << trianglesCount << std::endl;
+
+			LOG_INFO("verticesCount: %d", verticesCount);
+			LOG_INFO("edgesCount: %d", edgesCount);
+			LOG_INFO("trianglesCount: %d", trianglesCount);
 		}
 
 		void CheckNonManifold() {
@@ -253,21 +258,34 @@ namespace STLNonManifold {
 
 					if (edge_ptr->incident_triangles.size() != 2) {
 						non_manifold_count++;
-						std::cout << "======" << std::endl;
-						std::cout << "NonManifold: " << edge_ptr->incident_triangles.size() << std::endl;
-						std::cout << "Triangle: " << triangle_ptr->id << std::endl;
-						std::cout << "Edge: " << edge_ptr->id << std::endl;
-						std::cout << "Start Vertex: " << edge_ptr->start->id << std::endl;
-						std::cout << "(" << edge_ptr->start->pointCoord->x() <<", " << edge_ptr->start->pointCoord->y() << ", "<< edge_ptr->start->pointCoord->z() <<")" << std::endl;
-						std::cout << "End Vertex: " << edge_ptr->end->id << std::endl;
-						std::cout << "(" << edge_ptr->end->pointCoord->x() << ", " << edge_ptr->end->pointCoord->y() << ", " << edge_ptr->end->pointCoord->z() << ")" << std::endl;
-						std::cout << "======" << std::endl;
+						//std::cout << "======" << std::endl;
+						//std::cout << "NonManifold: " << edge_ptr->incident_triangles.size() << std::endl;
+						//std::cout << "Triangle: " << triangle_ptr->id << std::endl;
+						//std::cout << "Edge: " << edge_ptr->id << std::endl;
+						//std::cout << "Start Vertex: " << edge_ptr->start->id << std::endl;
+						//std::cout << "(" << edge_ptr->start->pointCoord->x() <<", " << edge_ptr->start->pointCoord->y() << ", "<< edge_ptr->start->pointCoord->z() <<")" << std::endl;
+						//std::cout << "End Vertex: " << edge_ptr->end->id << std::endl;
+						//std::cout << "(" << edge_ptr->end->pointCoord->x() << ", " << edge_ptr->end->pointCoord->y() << ", " << edge_ptr->end->pointCoord->z() << ")" << std::endl;
+						//std::cout << "======" << std::endl;
+
+						LOG_INFO("======");
+						LOG_INFO("NonManifold: %d", edge_ptr->incident_triangles.size());
+						LOG_INFO("Triangle: %d", triangle_ptr->id);
+						LOG_INFO("Edge: %d", edge_ptr->id);
+						LOG_INFO("Start Vertex: %d (.5lf, .5lf, .5lf)", edge_ptr->start->id, edge_ptr->start->pointCoord->x(), edge_ptr->start->pointCoord->y(), edge_ptr->start->pointCoord->z());
+						LOG_INFO("End Vertex: %d (.5lf, .5lf, .5lf)", edge_ptr->end->id, edge_ptr->end->pointCoord->x(), edge_ptr->end->pointCoord->y(), edge_ptr->end->pointCoord->z());
+						LOG_INFO("======");
+
 					}
 				}
 			}
 
 			std::cout << "Total NonManifold Count: " << non_manifold_count << std::endl;
 			std::cout << "CheckNonManifold end." << std::endl;
+
+			LOG_INFO("Total NonManifold Count: %d", non_manifold_count);
+			LOG_INFO("CheckNonManifold end.");
+
 		}
 		
 		stl_reader::StlMesh <STLNonManifold::Geometry::T_NUM, unsigned int> mesh;

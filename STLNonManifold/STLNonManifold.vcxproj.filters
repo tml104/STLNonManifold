@@ -8,10 +8,16 @@
     <Filter Include="stl_reader">
       <UniqueIdentifier>{0a716c2f-e8be-4a31-a343-40779fa988b8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\logger44">
+      <UniqueIdentifier>{43977001-772b-45bc-975b-2eb19fb3ec53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreOld.cpp">
+      <Filter>src\logger44</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -23,6 +29,9 @@
     </ClInclude>
     <ClInclude Include="KDTree.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreOld.h">
+      <Filter>src\logger44</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
