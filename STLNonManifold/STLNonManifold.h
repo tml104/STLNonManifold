@@ -272,8 +272,8 @@ namespace STLNonManifold {
 						LOG_INFO("NonManifold: %d", edge_ptr->incident_triangles.size());
 						LOG_INFO("Triangle: %d", triangle_ptr->id);
 						LOG_INFO("Edge: %d", edge_ptr->id);
-						LOG_INFO("Start Vertex: %d (.5lf, .5lf, .5lf)", edge_ptr->start->id, edge_ptr->start->pointCoord->x(), edge_ptr->start->pointCoord->y(), edge_ptr->start->pointCoord->z());
-						LOG_INFO("End Vertex: %d (.5lf, .5lf, .5lf)", edge_ptr->end->id, edge_ptr->end->pointCoord->x(), edge_ptr->end->pointCoord->y(), edge_ptr->end->pointCoord->z());
+						LOG_INFO("Start Vertex: %d (%.5lf, %.5lf, %.5lf)", edge_ptr->start->id, edge_ptr->start->pointCoord->x(), edge_ptr->start->pointCoord->y(), edge_ptr->start->pointCoord->z());
+						LOG_INFO("End Vertex: %d (%.5lf, %.5lf, %.5lf)", edge_ptr->end->id, edge_ptr->end->pointCoord->x(), edge_ptr->end->pointCoord->y(), edge_ptr->end->pointCoord->z());
 						LOG_INFO("======");
 
 					}
