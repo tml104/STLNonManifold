@@ -7,14 +7,29 @@
 #include <unordered_set>
 #include <unordered_map>
 #include <memory>
+#include <algorithm>
 
 #include <iostream>
+#include <fstream>
 #include <cstdio>
 #include <cstdlib>
 
 #include "./stl_reader/stl_reader.h"
 #include "KDTree.h"
 #include "CoreOld.h"
+
+template<typename T1, typename T2>
+auto myzip(const T1& container1, const T2& container2) {
+	std::vector<std::tuple<typename T1::value_type, typename T2::value_type>> result;
+	auto it1 = container1.begin();
+	auto it2 = container2.begin();
+	while (it1 != container1.end() && it2 != container2.end()) {
+		result.emplace_back(*it1, *it2);
+		++it1;
+		++it2;
+	}
+	return result;
+}
 
 namespace STLNonManifold {
 
@@ -103,6 +118,7 @@ namespace STLNonManifold {
 
 		struct Triangle {
 			std::vector<std::shared_ptr<Edge>> edges;
+			std::vector<bool> edges_senses; // true: 一致; false: 反转
 			int id;
 		};
 
@@ -118,6 +134,8 @@ namespace STLNonManifold {
 			int coords_count = 0;
 			for (size_t i_solid = 0; i_solid < mesh.num_solids(); i_solid++) {
 				for (size_t j_tri = mesh.solid_tris_begin(i_solid); j_tri < mesh.solid_tris_end(i_solid); j_tri++) {
+
+					// 我靠，居然返回的是指针？？？
 					STLNonManifold::Geometry::Coordinate coord0(mesh.tri_corner_coords(j_tri, 0), coords_count++);
 					STLNonManifold::Geometry::Coordinate coord1(mesh.tri_corner_coords(j_tri, 1), coords_count++);
 					STLNonManifold::Geometry::Coordinate coord2(mesh.tri_corner_coords(j_tri, 2), coords_count++);
@@ -125,7 +143,6 @@ namespace STLNonManifold {
 					coordinates.emplace_back(coord0);
 					coordinates.emplace_back(coord1);
 					coordinates.emplace_back(coord2);
-
 				}
 			}
 			
@@ -164,8 +181,9 @@ namespace STLNonManifold {
 			//std::cout << std::endl;
 
 			// 构造拓扑：构造顶点
+			// 注意这里vertex的id是按照坐标合并后新赋值的
 			int vertices_count = 0;
-			std::map<int, std::shared_ptr<STLNonManifold::Geometry::Vertex>> vertices_map;
+			std::map<int, std::shared_ptr<STLNonManifold::Geometry::Vertex>> vertices_map; // merged_index -> vertex
 			for (int i = 0; i < coords_count;i++) {
 				int vertex_merged_index = coordinates_indices[i];
 				auto it = vertices_map.find(vertex_merged_index);
@@ -189,7 +207,7 @@ namespace STLNonManifold {
 			// 构造拓扑：逐三角形地去构造
 			int edges_count = 0;
 			int triangles_count = 0;
-			std::map<std::pair<int, int>, std::shared_ptr<STLNonManifold::Geometry::Edge>> edges_map;
+			std::map<std::pair<int, int>, std::shared_ptr<STLNonManifold::Geometry::Edge>> edges_map; // (merge_index, merged_index) -> edge
 			for (int i = 0; i< coords_count; i += 3) {
 				// 三角
 				std::shared_ptr<STLNonManifold::Geometry::Triangle> triangle_ptr = std::make_shared<STLNonManifold::Geometry::Triangle>();
@@ -202,6 +220,10 @@ namespace STLNonManifold {
 					int p2_index = i + (j+1)%3;
 					int p1_merged_index = coordinates_indices[p1_index];
 					int p2_merged_index = coordinates_indices[p2_index];
+
+					int start_merged_index = p1_merged_index;
+					int end_merged_index = p2_merged_index;
+
 					if (p1_merged_index > p2_merged_index) {
 						std::swap(p1_merged_index, p2_merged_index);
 					}
@@ -211,12 +233,13 @@ namespace STLNonManifold {
 						// 对应（合并顶点后的）边不存在：创建
 						auto edge_ptr = std::make_shared<STLNonManifold::Geometry::Edge>();
 
-						edge_ptr->start = vertices_map[p1_merged_index];
-						edge_ptr->end = vertices_map[p2_merged_index];
+						edge_ptr->start = vertices_map[start_merged_index];
+						edge_ptr->end = vertices_map[end_merged_index];
 						edge_ptr->incident_triangles.emplace_back(triangle_ptr);
 						edge_ptr->id = edges_count++;
 
 						triangle_ptr->edges.emplace_back(edge_ptr);
+						triangle_ptr->edges_senses.emplace_back(true);
 
 						edges_map[std::make_pair(p1_merged_index, p2_merged_index)] = edge_ptr;
 					}
@@ -225,6 +248,7 @@ namespace STLNonManifold {
 						auto edge_ptr = it->second;
 						edge_ptr->incident_triangles.emplace_back(triangle_ptr);
 						triangle_ptr->edges.emplace_back(edge_ptr);
+						triangle_ptr->edges_senses.emplace_back(false);
 					}
 
 				}
@@ -288,6 +312,74 @@ namespace STLNonManifold {
 
 		}
 		
+		void Export2OBJ(const std::string& output_obj_file_path) {
+			// vertex中的id其实就可以被视为离散化后的各个点，因此可以直接根据这个为依据做导出
+			std::fstream f;
+			f.open(output_obj_file_path, std::ios::out | std::ios::trunc);
+
+			if (!f.is_open()) {
+				throw std::runtime_error("Open output_obj_file_path failed.");
+			}
+
+			f << "# verticesCount: " << verticesCount << "\n";
+			f << "# edgesCount: " << edgesCount << "\n";
+			f << "# trianglesCount: " << trianglesCount << "\n";
+
+			// v
+			// 从三角形开始遍历，取出每个顶点（当然要去重）
+			std::vector<std::shared_ptr<STLNonManifold::Geometry::Vertex>> vertices;
+			std::unordered_set<int> vertices_id_set;
+			for (auto&& triangle_ptr : triangles) {
+				for (auto&& edge_ptr : triangle_ptr->edges) {
+					int vertices_id = edge_ptr->start->id;
+					
+					if (vertices_id_set.count(vertices_id) == 0) {
+						vertices.emplace_back(edge_ptr->start);
+						vertices_id_set.insert(vertices_id);
+					}
+
+					vertices_id = edge_ptr->end->id;
+					if (vertices_id_set.count(vertices_id) == 0) {
+						vertices.emplace_back(edge_ptr->end);
+						vertices_id_set.insert(vertices_id);
+					}
+				}
+			}
+
+			std::sort(vertices.begin(), vertices.end(), [](const std::shared_ptr<STLNonManifold::Geometry::Vertex>& a, const std::shared_ptr<STLNonManifold::Geometry::Vertex>& b) {
+				return a->id < b->id;
+			});
+
+			for (auto&& v_ptr : vertices) {
+				f << "v " << v_ptr->pointCoord->x() << " " << v_ptr->pointCoord->y() << " " << v_ptr->pointCoord->z() << "\n";
+			}
+
+			// f
+			for (auto&& triangle_ptr : triangles) {
+				std::vector<int> vertices_3_indices;
+				vertices_3_indices.reserve(3);
+
+				auto zipped = myzip(triangle_ptr->edges, triangle_ptr->edges_senses);
+				for (const auto& [edge_ptr, edge_sense] : zipped) {
+					if (edge_sense) {
+						vertices_3_indices.emplace_back(edge_ptr->start->id);
+					}
+					else {
+						vertices_3_indices.emplace_back(edge_ptr->end->id);
+					}
+
+				}
+
+				f << "f";
+				for (auto&& vertices_index : vertices_3_indices) {
+					f <<" " << vertices_index+1;
+				}
+				f << "\n";
+			}
+
+			f.close();
+		}
+
 		stl_reader::StlMesh <STLNonManifold::Geometry::T_NUM, unsigned int> mesh;
 		std::vector<std::shared_ptr<STLNonManifold::Geometry::Triangle>> triangles;
 

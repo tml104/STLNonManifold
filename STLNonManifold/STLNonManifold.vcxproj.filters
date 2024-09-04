@@ -33,6 +33,9 @@
     <ClInclude Include="CoreOld.h">
       <Filter>src\logger44</Filter>
     </ClInclude>
+    <ClInclude Include="argparser.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\Readme.md" />

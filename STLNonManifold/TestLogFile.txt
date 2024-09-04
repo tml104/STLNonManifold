@@ -1,0 +1,5 @@
+[2024-9-5 0:43:43][PID: 30232][TID: 24404][INFO ][FILE: D:\code\vs\STLNonManifold\STLNonManifold\STLNonManifold.h][STLNonManifold::STLNonManifoldChecker::STLNonManifoldChecker:  268] verticesCount: 56203
+[2024-9-5 0:43:43][PID: 30232][TID: 24404][INFO ][FILE: D:\code\vs\STLNonManifold\STLNonManifold\STLNonManifold.h][STLNonManifold::STLNonManifoldChecker::STLNonManifoldChecker:  269] edgesCount: 168603
+[2024-9-5 0:43:43][PID: 30232][TID: 24404][INFO ][FILE: D:\code\vs\STLNonManifold\STLNonManifold\STLNonManifold.h][STLNonManifold::STLNonManifoldChecker::STLNonManifoldChecker:  270] trianglesCount: 112402
+[2024-9-5 0:43:43][PID: 30232][TID: 24404][INFO ][FILE: D:\code\vs\STLNonManifold\STLNonManifold\STLNonManifold.h][STLNonManifold::STLNonManifoldChecker::CheckNonManifold:  310] Total NonManifold Count: 0
+[2024-9-5 0:43:43][PID: 30232][TID: 24404][INFO ][FILE: D:\code\vs\STLNonManifold\STLNonManifold\STLNonManifold.h][STLNonManifold::STLNonManifoldChecker::CheckNonManifold:  311] CheckNonManifold end.

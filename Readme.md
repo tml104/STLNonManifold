@@ -71,3 +71,7 @@ Check end.
 zhu.stl:
 
 ![zhu](./STLNonManifold/stl_models/zhu.png)
+
+## Known issue
+
+- It seems that there are wrong answers when you compile in g++. 
