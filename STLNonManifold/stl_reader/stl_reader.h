@@ -588,6 +588,11 @@ namespace stl_reader {
 				//  Instead we count the number of tokens using 'tokenCount'.
 				getline(in, buffer);
 
+				// TODO: 去掉前导空格……
+				if (buffer == "") {
+					continue;
+				}
+
 				istringstream line(buffer);
 				int tokenCount = 0;
 				while (!(line.eof() || line.fail())) {
